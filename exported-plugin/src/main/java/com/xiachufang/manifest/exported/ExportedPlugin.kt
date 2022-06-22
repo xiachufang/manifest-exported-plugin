@@ -44,7 +44,7 @@ class ExportedPlugin : Plugin<Project> {
             val t = p.tasks.getByName(
                 String.format(
                     "process%sMainManifest",
-                    it.capitalized()
+                    it.capitalize()
                 )
             ) as ProcessApplicationManifest
             val exportedTask =
@@ -53,15 +53,6 @@ class ExportedPlugin : Plugin<Project> {
             exportedTask.setMainManifest(t.mainManifest.get())
             exportedTask.setManifests(t.getManifests().files)
             t.dependsOn(exportedTask)
-        }
-    }
-
-    @OptIn(ExperimentalStdlibApi::class)
-    private fun String.capitalized(): String {
-        return this.replaceFirstChar {
-            if (it.isLowerCase())
-                it.titlecase(Locale.getDefault())
-            else it.toString()
         }
     }
 

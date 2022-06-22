@@ -1,9 +1,9 @@
 package com.xiachufang.manifest.exported
 
-import groovy.namespace.QName
 import groovy.util.Node
 import groovy.util.NodeList
-import groovy.xml.XmlParser
+import groovy.util.XmlParser
+import groovy.xml.QName
 import java.io.File
 import java.io.PrintWriter
 import org.gradle.api.DefaultTask
