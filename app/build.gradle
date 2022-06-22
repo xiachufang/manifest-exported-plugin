@@ -1,14 +1,14 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.xiachufang.manifest.exported'
+//    id 'com.xiachufang.manifest.exported'
 }
 
-exported {
-    enableLog true
-    whiteFile null
-    enableMainManifest false
-}
+//exported {
+//    enableLog true
+//    whiteFile null
+//    enableMainManifest false
+//}
 
 
 android {

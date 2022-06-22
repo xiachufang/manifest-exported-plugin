@@ -2,17 +2,19 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
+        maven { url 'https://jitpack.io' }
         mavenCentral()
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
+        maven { url 'https://jitpack.io' }
         mavenCentral()
     }
 }
 rootProject.name = "ManifestExportedPlugin"
 include ':app'
-includeBuild('exported-plugin')
-//include ':exported-plugin'
+include ':exported-plugin'
+//includeBuild('exported-plugin')

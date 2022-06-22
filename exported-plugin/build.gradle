@@ -3,11 +3,6 @@ apply plugin: 'java-gradle-plugin'
 apply plugin: 'maven-publish'
 
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
 buildscript {
     repositories {
         google()
@@ -23,6 +18,9 @@ repositories {
     google()
     mavenCentral()
 }
+
+sourceCompatibility = JavaVersion.VERSION_11
+
 
 group = 'com.xiachufang'
 description = '适配Android12 Manifest-exported 的插件'
