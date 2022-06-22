@@ -3,10 +3,6 @@
     package="com.xiachufang.child">
 
     <application>
-        <activity android:name="TestActivity">
-            <intent-filter>
-
-            </intent-filter>
-        </activity>
+        <activity android:name="TestActivity" />
     </application>
 </manifest>
