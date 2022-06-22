@@ -18,3 +18,4 @@ rootProject.name = "ManifestExportedPlugin"
 include ':app'
 include ':exported-plugin'
 //includeBuild('exported-plugin')
+include ':childModel'

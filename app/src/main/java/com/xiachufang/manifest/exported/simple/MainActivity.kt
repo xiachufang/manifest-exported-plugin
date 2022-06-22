@@ -1,8 +1,8 @@
 package com.xiachufang.manifest.exported.simple
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.petterp.androidexportedplugin.R
+import androidx.appcompat.app.AppCompatActivity
+import com.xiachufang.manifest.exported.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

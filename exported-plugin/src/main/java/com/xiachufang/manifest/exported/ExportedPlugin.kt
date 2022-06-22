@@ -20,13 +20,13 @@ class ExportedPlugin : Plugin<Project> {
         project.extensions.create(EXPORTED_EXT, ExportedExtension::class.java)
         project.task(TASK_NAME)
         val ext = project.properties[EXPORTED_EXT] as ExportedExtension
-        readVariant(project)
+        readAppModelVariant(project)
         project.afterEvaluate {
             addMainManifestTask(ext, project)
         }
     }
 
-    private fun readVariant(p: Project) {
+    private fun readAppModelVariant(p: Project) {
         val appExtension = p.extensions.getByType(AppExtension::class.java)
         appExtension.variantFilter { variantFilter: VariantFilter ->
             variantNames.add(

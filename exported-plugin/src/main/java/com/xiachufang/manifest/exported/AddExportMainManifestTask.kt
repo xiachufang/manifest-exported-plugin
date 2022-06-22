@@ -10,7 +10,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
 /**
- * 对于AppExport
+ * 在processDebugMainManifest之前对manifest进行处理
  * @author petterp To 2022/6/21
  */
 open class AddExportMainManifestTask : DefaultTask() {
@@ -23,7 +23,7 @@ open class AddExportMainManifestTask : DefaultTask() {
     // 第三方aar的Manifest
     private lateinit var manifests: Set<File>
 
-    private val qAndroidKey =
+    private val qNameKey =
         QName("http://schemas.android.com/apk/res/android", "name", "android")
     private val qExportedKey =
         QName("http://schemas.android.com/apk/res/android", "exported", "android")
@@ -42,47 +42,52 @@ open class AddExportMainManifestTask : DefaultTask() {
 
     @TaskAction
     fun action() {
-        println("-----exported->start")
+        println("-----exported->start------")
         // 默认不对主manifest做处理,交给系统自行处理,主要原因是这里是我们业务可控制部分
         if (extArg.enableMainManifest)
             exportedManifest(mainManifest)
         manifests.forEach {
             exportedManifest(it)
         }
-        println("-----exported->End")
+        println("-----exported->End--------")
     }
 
     private fun exportedManifest(file: File) {
-        extArg.toLog("-----开始处理指定File：${file.path}")
+        val aarName = file.parentFile.name
+        extArg.log("开始处理[$aarName]")
+        extArg.log("path: [${file.path}]")
         if (!file.exists()) {
-            throw RuntimeException("${file.path}不存在")
+            extArg.log("[$aarName]不存在")
+            return
         }
         val xml = XmlParser().parse(file)
         // 先拿出appNode
         val applicationNode = xml.children()[0] as Node
-        val exportedTag = "android:exported"
-        // 过滤出指定node,只有没有添加exported的才主动添加,避免系统报错
+        // 过滤使用 intent 过滤器的 activity、服务 或 广播接收器 && exported未显式声明
         val nodes = applicationNode.children().asSequence().map {
             it as Node
-        }.filter {
+        }.filter { it ->
             val name = it.name()
             (name == "activity" || name == "receiver" || name == "service") &&
-                it.attribute(qExportedKey) == null
+                it.attribute(qExportedKey) == null && it.nodeList().any {
+                it.name() == "intent-filter"
+            }
         }.toList().takeIf {
             it.isNotEmpty()
         }
         if (nodes === null) {
-            extArg.toLog("未匹配到指定项,跳过此File")
+            extArg.log("[$aarName] 未匹配可以更改的,跳过")
             return
         }
+
+        // 开始自定义逻辑,目前只判断action部分即可
         nodes.forEach { it ->
-            // 只有包含了过滤器并且action不为null才处理
             val isExported = it.nodeList().any { node ->
-                node.name() == "intent-filter" && node.nodeList().any {
-                    it.name() == "action"
+                node.nodeList().any {
+                    it.name() == "action" && it.anyTag(qNameKey, values = extArg.actionRules)
                 }
             }
-            it.attributes()[exportedTag] = "$isExported"
+            it.attributes()["android:exported"] = "$isExported"
         }
         val pw = PrintWriter(file)
         pw.write(groovy.xml.XmlUtil.serialize(xml))
@@ -91,7 +96,7 @@ open class AddExportMainManifestTask : DefaultTask() {
 
     private fun Node.nodeList() = (this.value() as NodeList).map { it as Node }
 
-    private fun Node.anyTag(key: String, vararg values: String) =
+    private fun Node.anyTag(key: QName, vararg values: String) =
         attributes()[key]?.let { value ->
             values.any {
                 it == value.toString()
