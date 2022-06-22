@@ -4,6 +4,7 @@ import com.android.build.api.variant.VariantFilter
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.tasks.ProcessApplicationManifest
+import org.gradle.api.Action
 import java.util.* // ktlint-disable no-wildcard-imports
 import kotlin.collections.ArrayList
 import org.gradle.api.Plugin
@@ -28,11 +29,11 @@ class ExportedPlugin : Plugin<Project> {
 
     private fun readAppModelVariant(p: Project) {
         val appExtension = p.extensions.getByType(AppExtension::class.java)
-        appExtension.variantFilter { variantFilter: VariantFilter ->
+        appExtension.variantFilter(Action {
             variantNames.add(
-                variantFilter.name
+                it.name
             )
-        }
+        })
     }
 
     /**

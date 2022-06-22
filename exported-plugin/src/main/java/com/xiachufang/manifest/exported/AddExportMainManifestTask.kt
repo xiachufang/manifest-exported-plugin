@@ -84,7 +84,8 @@ open class AddExportMainManifestTask : DefaultTask() {
         nodes.forEach { it ->
             val isExported = it.nodeList().any { node ->
                 node.nodeList().any {
-                    it.name() == "action" && it.anyTag(qNameKey, values = extArg.actionRules)
+                    it.name() == "action" &&
+                        it.anyTag(qNameKey, extArg.actionRules)
                 }
             }
             it.attributes()["android:exported"] = "$isExported"
@@ -96,7 +97,7 @@ open class AddExportMainManifestTask : DefaultTask() {
 
     private fun Node.nodeList() = (this.value() as NodeList).map { it as Node }
 
-    private fun Node.anyTag(key: QName, vararg values: String) =
+    private fun Node.anyTag(key: QName, values: Array<String>) =
         attributes()[key]?.let { value ->
             values.any {
                 it == value.toString()
