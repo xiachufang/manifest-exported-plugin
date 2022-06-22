@@ -1,0 +1,63 @@
+apply plugin: 'kotlin'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'maven-publish'
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+    }
+}
+
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+group = 'com.xiachufang'
+description = '适配Android12 Manifest-exported 的插件'
+version = '1.0'
+
+gradlePlugin {
+    plugins {
+        exportedPlugin {
+            id = 'com.xiachufang.manifest.exported'
+            implementationClass = 'com.xiachufang.manifest.exported.ExportedPlugin'
+        }
+    }
+}
+
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'exported-plugin'
+            from components.java
+        }
+    }
+    //插件存储库
+    repositories {
+        maven {
+            url = uri('../repo')
+        }
+    }
+}
+
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10"
+    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+    implementation 'com.android.tools.build:gradle:7.0.3'
+}
+
+

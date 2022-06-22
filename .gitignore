@@ -1,3 +1,15 @@
+*.iml
+.gradle
+/local.properties
+/.settings/org.eclipse.core.resources.prefs
+.DS_Store
+/build
+/captures
+/repo
+.idea/
+.externalNativeBuild
+.cxx
+local.properties
 # Built application files
 *.apk
 *.aar
