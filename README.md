@@ -45,7 +45,7 @@ Gradle7.0+,并且已经对依赖方式进行过调整，则可能需要添加到
 
 ```groovy
 dependencies {
-      classpath 'com.github.xiachufang:manifest-exported-plugin:1.0.4'
+      classpath 'com.github.xiachufang:manifest-exported-plugin:1.0.5'
 }
 ```
 
@@ -76,22 +76,22 @@ apply plugin: 'com.xiachufang.manifest.exported'
 ...
   
 exported {
-    enableLog false
     actionRules = ["android.intent.action.MAIN"]
     enableMainManifest false
+    logOutPath ""
 }
 ```
 
-- **enableLog** 是否打开日志，默认false
+- **logOutPath** 日志输出目录，默认 app/build/exported/outManifest.md
 
 - **actionRules** action的匹配项(数组), 如：
 
   ```
   <activity android:name=".simple.MainActivity" >
         <intent-filter>
-        	// action 对应的 android:name 可与actionRules 数组任意一项匹配 ,并且当前没有配置exported
-      		// -> yes: android:exported="true"
-      		// -> no: android:exported="false"
+            // action 对应的 android:name 可与actionRules 数组任意一项匹配 ,并且当前没有配置exported
+              // -> yes: android:exported="true"
+              // -> no: android:exported="false"
           <action android:name="android.intent.action.MAIN"/>
           <category android:name="android.intent.category.LAUNCHER"/>
         </intent-filter>
@@ -103,6 +103,8 @@ exported {
   对于主model,属于业务可控的，建议开发者自行调整。
 
   插件默认不会对主 model-AndroidManifest 进行修改,如果发现可用匹配上述规则的，即会进行修正。
+  
+  开发者可根据日志中的提示，进行修改。
 
   > 注意：这个操作会对Manifest的展示样式造成一定影响，建议一般不要打开。
 
