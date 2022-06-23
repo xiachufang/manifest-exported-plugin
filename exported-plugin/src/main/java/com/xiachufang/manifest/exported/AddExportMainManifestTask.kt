@@ -41,20 +41,36 @@ open class AddExportMainManifestTask : DefaultTask() {
     fun action() {
         println("-----exported->start------")
         // 默认不对主manifest做处理,交给系统自行处理,主要原因是这里是我们业务可控制部分
-        if (extArg.enableMainManifest)
-            exportedManifest(mainManifest)
+        val builder: StringBuilder = StringBuilder()
+        builder.append("# exported日志输出\n\n")
+        builder.append("## App-AndroidManifest\n")
+        builder.append("> 这里是你的业务主model下需要调整的,建议手动处理。\n")
+        exportedManifest(mainManifest, builder, extArg.enableMainManifest)
+        builder.append("> 主model处理结束。\n")
+        builder.append("---\n\n\n")
+        builder.append("## aar-AndroidManifest\n")
+        builder.append("> 这里是你的其他model或者aar下需要调整的,插件会自动进行处理。\n")
         manifests.forEach {
-            exportedManifest(it)
+            exportedManifest(it, builder, false)
         }
-        println("-----exported->End--------")
+        writeOut(builder, "outManifest")
+        println("-----exported->End------")
     }
 
-    private fun exportedManifest(file: File) {
+    private fun writeOut(outBuilder: StringBuilder, fileName: String) {
+        val wikiFileDir = File("${extArg.logOutPath}/exported")
+        if (!wikiFileDir.exists()) wikiFileDir.mkdir()
+        val wikiFile = File(wikiFileDir, "$fileName.md")
+        if (wikiFile.exists()) wikiFile.delete()
+        wikiFile.writeText(outBuilder.toString())
+    }
+
+    private fun exportedManifest(file: File, outBuilder: StringBuilder, isMain: Boolean) {
         val aarName = file.parentFile.name
-        extArg.log("开始处理[$aarName]")
-        extArg.log("path: [${file.path}]")
+        outBuilder.append("#### 开始处理-> [$aarName]\n")
+        outBuilder.append("- path= ${file.path}\n")
         if (!file.exists()) {
-            extArg.log("[$aarName]不存在")
+            outBuilder.append("- 文件不存在,已跳过\n\n")
             return
         }
         val xml = XmlParser(false, false).parse(file)
@@ -63,7 +79,7 @@ open class AddExportMainManifestTask : DefaultTask() {
             it.name() == "application"
         }
         if (applicationNode === null) {
-            extArg.log("[$aarName] 未匹配可以更改的,跳过")
+            outBuilder.append("- 未匹配到ApplicationNode,已跳过\n\n")
             return
         }
         // 过滤使用 intent 过滤器的 activity、服务 或 广播接收器 && exported未显式声明
@@ -79,23 +95,27 @@ open class AddExportMainManifestTask : DefaultTask() {
             it.isNotEmpty()
         }
         if (nodes === null) {
-            extArg.log("[$aarName] 未匹配可以更改的,跳过")
+            outBuilder.append("- 未命中可修改的节点,已跳过\n\n")
             return
         }
-        nodes.forEach { it ->
+        outBuilder.append("- 已找到[${nodes.size}]处exported需要适配 \n")
+        nodes.forEachIndexed { index, it ->
             val isExported = it.nodeList().any { node ->
                 node.nodeList().any {
                     it.name() == "action" &&
                         it.anyTag(qNameKey, extArg.actionRules)
                 }
             }
+            outBuilder.append("  ${index + 1}. name:[${it.attributes()["android:name"]}],exported:[$isExported]\n")
             it.attributes()["android:exported"] = "$isExported"
         }
-        val result = XmlUtil.serialize(xml)
-        file.writer(Charsets.UTF_8).use {
-            it.write(result)
+        if (isMain) {
+            val result = XmlUtil.serialize(xml)
+            file.writer(Charsets.UTF_8).use {
+                it.write(result)
+            }
         }
-        extArg.log("[$aarName] 处理结束,更改了[${nodes.size}]处")
+        outBuilder.append("- 处理结束\n\n")
     }
 
     private fun Node.nodeList() = (this.value() as NodeList).mapNotNull {

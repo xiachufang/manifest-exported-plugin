@@ -21,6 +21,9 @@ class ExportedPlugin : Plugin<Project> {
         val ext = project.properties[EXPORTED_EXT] as ExportedExtension
         readAppModelVariant(project)
         project.afterEvaluate {
+            if (ext.logOutPath.isEmpty()) {
+                ext.logOutPath = it.buildDir.absoluteFile.path
+            }
             addMainManifestTask(ext, project)
         }
     }
