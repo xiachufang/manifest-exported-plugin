@@ -6,13 +6,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:7.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31"
     }
 }
 
 //plugins {
-//    // 这个 id 就是在 lc_versio/≥n 文件夹下 build.gradle 文件内定义的id
 //    id 'com.xiachufang.manifest.exported' apply false
 //}
 
