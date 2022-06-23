@@ -3,7 +3,6 @@ package com.xiachufang.manifest.exported
 import groovy.util.Node
 import groovy.util.NodeList
 import groovy.util.XmlParser
-import groovy.xml.QName
 import groovy.xml.XmlUtil
 import java.io.File
 import org.gradle.api.DefaultTask
@@ -68,8 +67,8 @@ open class AddExportMainManifestTask : DefaultTask() {
             return
         }
         // 过滤使用 intent 过滤器的 activity、服务 或 广播接收器 && exported未显式声明
-        val nodes = applicationNode.children().asSequence().map {
-            it as Node
+        val nodes = applicationNode.children().asSequence().mapNotNull {
+            it as? Node
         }.filter { it ->
             val name = it.name()
             (name == "activity" || name == "receiver" || name == "service") &&
@@ -99,7 +98,10 @@ open class AddExportMainManifestTask : DefaultTask() {
         extArg.log("[$aarName] 处理结束,更改了[${nodes.size}]处")
     }
 
-    private fun Node.nodeList() = (this.value() as NodeList).map { it as Node }
+    private fun Node.nodeList() = (this.value() as NodeList).mapNotNull {
+        // 用于防止某些不标准的写法,如//xx 注释直接写到了manifest里
+        it as? Node
+    }
 
     private fun Node.anyTag(key: String, values: Array<String>): Boolean {
         // 如果规则为null,直接返回false,对于无法匹配的,做出扼制,不应让其显示声明出来
