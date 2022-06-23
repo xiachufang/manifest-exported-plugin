@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manifest package="com.xiachufang.manifest.exported">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.xiachufang.manifest.exported">
 
-    <application xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <queries>
+
+        <package android:name="com.tencent.mm" />
+
+        <package android:name="com.sina.weibo" />
+
+        <intent>
+
+            <action android:name="android.intent.action.CHOOSER" />
+
+        </intent>
+
+    </queries>
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application xmlns:tools="http://schemas.android.com/tools"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
