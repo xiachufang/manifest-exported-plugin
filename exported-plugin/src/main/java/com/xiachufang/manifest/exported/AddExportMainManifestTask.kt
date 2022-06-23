@@ -23,10 +23,8 @@ open class AddExportMainManifestTask : DefaultTask() {
     // 第三方aar的Manifest
     private lateinit var manifests: Set<File>
 
-    private val qNameKey =
-        QName("http://schemas.android.com/apk/res/android", "name", "android")
-    private val qExportedKey =
-        QName("http://schemas.android.com/apk/res/android", "exported", "android")
+    private val qNameKey = "android:name"
+    private val qExportedKey = "android:exported"
 
     fun setManifests(files: Set<File>) {
         this.manifests = files
@@ -60,7 +58,7 @@ open class AddExportMainManifestTask : DefaultTask() {
             extArg.log("[$aarName]不存在")
             return
         }
-        val xml = XmlParser().parse(file)
+        val xml = XmlParser(false, false).parse(file)
         // 先拿出appNode
         val applicationNode = xml.nodeList().firstOrNull {
             it.name() == "application"
@@ -103,7 +101,7 @@ open class AddExportMainManifestTask : DefaultTask() {
 
     private fun Node.nodeList() = (this.value() as NodeList).map { it as Node }
 
-    private fun Node.anyTag(key: QName, values: Array<String>): Boolean {
+    private fun Node.anyTag(key: String, values: Array<String>): Boolean {
         // 如果规则为null,直接返回false,对于无法匹配的,做出扼制,不应让其显示声明出来
         if (values.isEmpty()) return false
         return attributes()[key]?.let { v ->
