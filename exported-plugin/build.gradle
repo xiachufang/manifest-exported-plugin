@@ -24,7 +24,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 
 group = 'com.xiachufang'
 description = '适配Android12 Manifest-exported 的插件'
-version = '1.0.2'
+version = '1.0.3'
 
 gradlePlugin {
     plugins {
