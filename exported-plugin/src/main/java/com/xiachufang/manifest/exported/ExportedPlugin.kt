@@ -1,12 +1,10 @@
 package com.xiachufang.manifest.exported
 
-import com.android.build.api.variant.VariantFilter
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.tasks.ProcessApplicationManifest
-import org.gradle.api.Action
-import java.util.* // ktlint-disable no-wildcard-imports
 import kotlin.collections.ArrayList
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -29,11 +27,13 @@ class ExportedPlugin : Plugin<Project> {
 
     private fun readAppModelVariant(p: Project) {
         val appExtension = p.extensions.getByType(AppExtension::class.java)
-        appExtension.variantFilter(Action {
-            variantNames.add(
-                it.name
-            )
-        })
+        appExtension.variantFilter(
+            Action {
+                variantNames.add(
+                    it.name
+                )
+            }
+        )
     }
 
     /**

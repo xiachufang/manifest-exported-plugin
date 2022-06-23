@@ -4,8 +4,8 @@ import groovy.util.Node
 import groovy.util.NodeList
 import groovy.util.XmlParser
 import groovy.xml.QName
+import groovy.xml.XmlUtil
 import java.io.File
-import java.io.PrintWriter
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -62,7 +62,13 @@ open class AddExportMainManifestTask : DefaultTask() {
         }
         val xml = XmlParser().parse(file)
         // 先拿出appNode
-        val applicationNode = xml.children()[0] as Node
+        val applicationNode = xml.nodeList().firstOrNull {
+            it.name() == "application"
+        }
+        if (applicationNode === null) {
+            extArg.log("[$aarName] 未匹配可以更改的,跳过")
+            return
+        }
         // 过滤使用 intent 过滤器的 activity、服务 或 广播接收器 && exported未显式声明
         val nodes = applicationNode.children().asSequence().map {
             it as Node
@@ -79,8 +85,6 @@ open class AddExportMainManifestTask : DefaultTask() {
             extArg.log("[$aarName] 未匹配可以更改的,跳过")
             return
         }
-
-        // 开始自定义逻辑,目前只判断action部分即可
         nodes.forEach { it ->
             val isExported = it.nodeList().any { node ->
                 node.nodeList().any {
@@ -90,17 +94,23 @@ open class AddExportMainManifestTask : DefaultTask() {
             }
             it.attributes()["android:exported"] = "$isExported"
         }
-        val pw = PrintWriter(file)
-        pw.write(groovy.xml.XmlUtil.serialize(xml))
-        pw.close()
+        val result = XmlUtil.serialize(xml)
+        file.writer(Charsets.UTF_8).use {
+            it.write(result)
+        }
+        extArg.log("[$aarName] 处理结束,更改了[${nodes.size}]处")
     }
 
     private fun Node.nodeList() = (this.value() as NodeList).map { it as Node }
 
-    private fun Node.anyTag(key: QName, values: Array<String>) =
-        attributes()[key]?.let { value ->
+    private fun Node.anyTag(key: QName, values: Array<String>): Boolean {
+        // 如果规则为null,直接返回false,对于无法匹配的,做出扼制,不应让其显示声明出来
+        if (values.isEmpty()) return false
+        return attributes()[key]?.let { v ->
+            val value = v.toString()
             values.any {
-                it == value.toString()
+                it == value
             }
         } ?: false
+    }
 }
