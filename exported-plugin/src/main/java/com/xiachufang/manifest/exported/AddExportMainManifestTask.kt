@@ -6,6 +6,7 @@ import groovy.util.XmlParser
 import groovy.xml.XmlUtil
 import java.io.File
 import org.gradle.api.DefaultTask
+import org.gradle.api.java.archives.ManifestException
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -21,6 +22,8 @@ open class AddExportMainManifestTask : DefaultTask() {
 
     // 第三方aar的Manifest
     private lateinit var manifests: Set<File>
+
+    private var exportedError = false
 
     private val qNameKey = "android:name"
     private val qExportedKey = "android:exported"
@@ -43,29 +46,43 @@ open class AddExportMainManifestTask : DefaultTask() {
         // 默认不对主manifest做处理,交给系统自行处理,主要原因是这里是我们业务可控制部分
         val builder: StringBuilder = StringBuilder()
         builder.append("# exported日志输出\n\n")
+        builder.append("## 当前插件配置\n")
+        builder.append("- enableMainManifest: [${extArg.enableMainManifest}]\n")
+        builder.append("- actionRules\n")
+        extArg.actionRules.forEach {
+            builder.append("  - [$it]\n")
+        }
+        builder.append("- logOutPath: [${extArg.logOutPath}]\n\n")
+
         builder.append("## App-AndroidManifest\n")
         builder.append("> 这里是你的业务主model下需要调整的,建议手动处理。\n")
         exportedManifest(mainManifest, builder, extArg.enableMainManifest)
         builder.append("> 主model处理结束。\n")
         builder.append("---\n\n\n")
+
         builder.append("## aar-AndroidManifest\n")
         builder.append("> 这里是你的其他model或者aar下需要调整的,插件会自动进行处理。\n")
         manifests.forEach {
-            exportedManifest(it, builder, false)
+            exportedManifest(it, builder, true)
         }
-        writeOut(builder, "outManifest")
+        if (exportedError) {
+            builder.append("## 处理终止,请手动处理主model。")
+            writeOut(builder)
+            throw ManifestException(" Manifest merger failed : android:exported needs to be explicitly specified for <activity>. Apps targeting Android 12 and higher are required to specify an explicit value for `android:exported` when the corresponding component has an intent filter defined. See https://developer.android.com/guide/topics/manifest/activity-element#exported for details")
+        }
+        writeOut(builder)
         println("-----exported->End------")
     }
 
-    private fun writeOut(outBuilder: StringBuilder, fileName: String) {
+    private fun writeOut(outBuilder: StringBuilder) {
         val wikiFileDir = File("${extArg.logOutPath}/exported")
         if (!wikiFileDir.exists()) wikiFileDir.mkdir()
-        val wikiFile = File(wikiFileDir, "$fileName.md")
+        val wikiFile = File(wikiFileDir, "outManifestLog.md")
         if (wikiFile.exists()) wikiFile.delete()
         wikiFile.writeText(outBuilder.toString())
     }
 
-    private fun exportedManifest(file: File, outBuilder: StringBuilder, isMain: Boolean) {
+    private fun exportedManifest(file: File, outBuilder: StringBuilder, isWrite: Boolean) {
         val aarName = file.parentFile.name
         outBuilder.append("#### 开始处理-> [$aarName]\n")
         outBuilder.append("- path= ${file.path}\n")
@@ -109,13 +126,15 @@ open class AddExportMainManifestTask : DefaultTask() {
             outBuilder.append("  ${index + 1}. name:[${it.attributes()["android:name"]}],exported:[$isExported]\n")
             it.attributes()["android:exported"] = "$isExported"
         }
-        if (isMain) {
+        outBuilder.append("- 处理结束\n\n")
+        if (isWrite) {
             val result = XmlUtil.serialize(xml)
             file.writer(Charsets.UTF_8).use {
                 it.write(result)
             }
+        } else {
+            exportedError = true
         }
-        outBuilder.append("- 处理结束\n\n")
     }
 
     private fun Node.nodeList() = (this.value() as NodeList).mapNotNull {
