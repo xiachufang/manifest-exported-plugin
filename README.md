@@ -45,7 +45,7 @@ Gradle7.0+,并且已经对依赖方式进行过调整，则可能需要添加到
 
 ```groovy
 dependencies {
-      classpath 'com.github.xiachufang:manifest-exported-plugin:1.0.5'
+      classpath 'com.github.xiachufang:manifest-exported-plugin:1.0.6'
 }
 ```
 
@@ -107,6 +107,22 @@ exported {
   开发者可根据日志中的提示，进行修改。
 
   > 注意：这个操作会对Manifest的展示样式造成一定影响，建议一般不要打开。
+
+## 📰 相关截图说明
+
+默认情况下插件的输出目录如下所示，主 model/build/exportred/outManifest.md,默认日志如下：
+
+![image-20220627110207568](https://tva1.sinaimg.cn/large/e6c9d24ely1h3mmdgxn8mj229j0u011e.jpg)
+
+## 💭 注意事项
+
+对于主model下的 `manifest` ，默认不进行适配(可开关 **enableManifest** )，会通过日志进行输出，建议大家自行对比调整。
+
+> 为什么默认不对主 `model` 进行适配？
+>
+> - 对于业务 `model` ,我们建议开发者自行适配,这属于我们可控范围，适配来说主要就是为了不可控的，即第三方 `aar`
+> - 修改之后，会影响原有的 `manifest` 代码风格，需要重新格式化一下，相比默认的，增加了不少空格，暂时不知道怎么解决。
+
 
 ## 原理简述
 
