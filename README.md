@@ -45,7 +45,7 @@ Gradle7.0+,并且已经对依赖方式进行过调整，则可能需要添加到
 
 ```groovy
 dependencies {
-      classpath 'com.github.xiachufang:manifest-exported-plugin:1.0.6'
+      classpath 'com.github.xiachufang:manifest-exported-plugin:1.0.7'
 }
 ```
 
@@ -63,50 +63,85 @@ apply plugin: 'com.xiachufang.manifest.exported'
 >
 > ```
 > plugins {
->     id 'com.xiachufang.manifest.exported'
+>  id 'com.xiachufang.manifest.exported'
 > }
 > ```
 
-### 参数说明
-
-app-build.gradle
+### build.gradle
 
 ```groovy
 apply plugin: 'com.xiachufang.manifest.exported'
 ...
   
 exported {
-    actionRules = ["android.intent.action.MAIN"]
+    // 是否写入主Model
     enableMainManifest false
-    logOutPath ""
+    // 规则
+    ruleFile new File("$projectDir/xxx.json")
+    // 输出文件,默认-app/build/exported/outManifestLog.md
+		outPutFile null
 }
 ```
 
-- **logOutPath** 日志输出目录，默认 app/build/exported/outManifest.md
+## 配置参数说明
 
-- **actionRules** action的匹配项(数组), 如：
+#### enableMainManifest
 
-  ```
-  <activity android:name=".simple.MainActivity" >
-        <intent-filter>
-            // action 对应的 android:name 可与actionRules 数组任意一项匹配 ,并且当前没有配置exported
-              // -> yes: android:exported="true"
-              // -> no: android:exported="false"
-          <action android:name="android.intent.action.MAIN"/>
-          <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
-  </activity>
-  ```
+是否对主 model-AndroidManifest 进行修改
 
-- **enableMainManifest** 是否对主 model-AndroidManifest 进行修改
+对于主model,属于业务可控的，建议开发者自行调整。
 
-  对于主model,属于业务可控的，建议开发者自行调整。
+插件默认不会对主 model-AndroidManifest 进行修改,如果发现可用匹配上述规则的，即会进行修正。
 
-  插件默认不会对主 model-AndroidManifest 进行修改,如果发现可用匹配上述规则的，即会进行修正。
-  
-  开发者可根据日志中的提示，进行修改。
+开发者可根据日志中的提示，进行修改。
 
-  > 注意：这个操作会对Manifest的展示样式造成一定影响，建议一般不要打开。
+> 注意：这个操作会对Manifest的展示样式造成一定影响，建议一般不要打开。
+
+### outPutFile
+
+日志输出目录，默认 app/build/exported/outManifest.md
+
+### ruleFile
+
+具体的规则json文件, 格式如下：
+
+```json
+{
+  "actionRules": [
+    "android.intent.action.MAIN"
+  ],
+  "whiteNames": [],
+  "blackPackages": [],
+  "blackNames": [],
+  "blackIgnores": []
+}
+```
+
+#### actionRules
+
+默认判断规则，用于当前没有配置 exported 的修改逻辑,如果当前存在exported,则跳过。
+
+具体判断逻辑: 
+
+如果 `intent-filter` - `action` 对应的 **android:name** 与 **actionRules** 中任意一条匹配,则将 `exported` 修改为 **true** ,否则为**false** 。
+
+#### whiteNames
+
+白名单类名,如果遇到此类,并且使用了 intent-filter ,则会将 `exported` 修改为 **true**
+
+#### blackPackages
+
+黑名单 包名合集,对于此包名下的类,如果使用了 intent-filter ,则会将 `exported` 直接修改为 **false**
+
+#### blackNames
+
+黑名单 类名合集，如果遇到此合集中的类,并且使用了 intent-filter ,则会将 `exported` 直接修改为 **true** 。判断逻辑会与上面 `blackPackages` 一起判断,两者满足其一即可。
+
+#### blackIgnores
+
+黑名单 下要忽视的类,在黑名单判断时,如果遇到此类，则使用默认规则 `actionRules` 判断。
+
+
 
 ## 📰 相关截图说明
 
