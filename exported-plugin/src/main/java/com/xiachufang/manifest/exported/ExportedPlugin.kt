@@ -40,7 +40,7 @@ class ExportedPlugin : Plugin<Project> {
     }
 
     /**
-     * 添加task到processxxxMainManifest之后
+     * 添加task到processxxxMainManifest之前
      * 如 processDebugMainManifest
      * */
     private fun addMainManifestTask(ext: ExportedExtension, p: Project) {

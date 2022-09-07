@@ -1,5 +1,7 @@
 package com.xiachufang.manifest.exported
 
+import java.io.File
+
 /**
  * @author petterp
  */
@@ -13,4 +15,7 @@ open class ExportedExtension {
 
     // 日志输出位置,会输出以下内容
     var logOutPath: String = ""
+
+    // 黑名单File规则,不会对主Model生效
+    var blackListRuleFile: File? = null
 }
