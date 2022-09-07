@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.xiachufang.manifest.exported">
-
-    <!--haha-->
     // ss
+
     <queries>
 
         <package android:name="com.tencent.mm" />
@@ -32,10 +31,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidExportedPlugin"
         tools:targetApi="31">
-
-        <activity
-            android:name=".simple.MainActivity"
-            android:exported="true">
+        <!--这是用来测试的,build完成后记得撤销这里的代码,便于再次测试-->
+        <activity android:name=".simple.MainActivity">
 
             <intent-filter>
 
@@ -47,7 +44,12 @@
 
         </activity>
 
-        <activity android:name=".simple.TestActivity" />
+        <activity android:name=".simple.TestActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+
 
     </application>
 

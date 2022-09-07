@@ -1,14 +1,17 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-//    id 'com.xiachufang.manifest.exported'
+    id 'com.xiachufang.manifest.exported'
 }
 
-//exported {
-//    enableLog true
-//    actionRules = ["android.intent.action.MAIN"]
-//    enableMainManifest true
-//}
+exported {
+    // 是否允许修改主main
+    enableMainManifest true
+    // 自定义日志输出位置,建议使用md格式
+    // 默认输出位置,app/build/exported/outManifestLog.md
+    outPutFile new File(("app/outManifestLog.md"))
+    ruleFile new File("app/exported_black_list.json")
+}
 
 
 android {
@@ -47,5 +50,6 @@ dependencies {
     implementation project(path: ':childModel')
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation "io.github.sinaweibosdk:core:11.11.1@aar"
 }
 
