@@ -32,7 +32,9 @@
         android:theme="@style/Theme.AndroidExportedPlugin"
         tools:targetApi="31">
         <!--这是用来测试的,build完成后记得撤销这里的代码,便于再次测试-->
-        <activity android:name=".simple.MainActivity">
+        <activity
+            android:name=".simple.MainActivity"
+            android:exported="true">
 
             <intent-filter>
 
@@ -44,11 +46,9 @@
 
         </activity>
 
-        <activity android:name=".simple.TestActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-            </intent-filter>
-        </activity>
+        <activity
+            android:name=".simple.TestActivity"
+            android:exported="true" />
 
 
     </application>

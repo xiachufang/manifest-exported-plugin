@@ -2,9 +2,7 @@
   "actionRules": [
     "android.intent.action.MAIN"
   ],
-  "whiteNames": [
-    ".simple.TestActivity"
-  ],
+  "whiteNames": [],
   "blackPackages": [
     "com.sina.weibo"
   ],
