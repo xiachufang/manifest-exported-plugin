@@ -25,9 +25,9 @@ class ExportedPlugin : Plugin<Project> {
         project.afterEvaluate {
             if (ext.outPutFile == null) {
                 val wikiFileDir = File("${it.buildDir.absoluteFile.path}/exported")
-                if (!wikiFileDir.exists()) wikiFileDir.mkdirs()
+                if (!wikiFileDir.exists()) wikiFileDir.mkdir()
                 val wikiFile = File(wikiFileDir, "outManifestLog.md")
-                wikiFile.delete()
+                if (wikiFile.exists()) wikiFile.delete()
                 wikiFile.mkdir()
                 ext.outPutFile = wikiFile
             }
