@@ -3,6 +3,7 @@ package com.xiachufang.manifest.exported
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.tasks.ProcessApplicationManifest
+import java.io.File
 import kotlin.collections.ArrayList
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -10,6 +11,7 @@ import org.gradle.api.Project
 
 /**
  * 适配Android12 exported 的插件
+ *
  * @author petterp To 2022/6/21
  */
 class ExportedPlugin : Plugin<Project> {
@@ -21,8 +23,13 @@ class ExportedPlugin : Plugin<Project> {
         val ext = project.properties[EXPORTED_EXT] as ExportedExtension
         readAppModelVariant(project)
         project.afterEvaluate {
-            if (ext.logOutPath.isEmpty()) {
-                ext.logOutPath = it.buildDir.absoluteFile.path
+            if (ext.outPutFile == null) {
+                val wikiFileDir = File("${it.buildDir.absoluteFile.path}/exported")
+                if (!wikiFileDir.exists()) wikiFileDir.mkdirs()
+                val wikiFile = File(wikiFileDir, "outManifestLog.md")
+                wikiFile.delete()
+                wikiFile.mkdir()
+                ext.outPutFile = wikiFile
             }
             addMainManifestTask(ext, project)
         }
@@ -39,10 +46,7 @@ class ExportedPlugin : Plugin<Project> {
         )
     }
 
-    /**
-     * 添加task到processxxxMainManifest之后
-     * 如 processDebugMainManifest
-     * */
+    /** 添加task到processxxxMainManifest之前 如 processDebugMainManifest */
     private fun addMainManifestTask(ext: ExportedExtension, p: Project) {
         variantNames.forEach {
             val t = p.tasks.getByName(
