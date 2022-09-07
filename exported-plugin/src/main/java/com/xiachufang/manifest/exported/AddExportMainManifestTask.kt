@@ -79,12 +79,12 @@ open class AddExportMainManifestTask : DefaultTask() {
         val builder: StringBuilder = StringBuilder()
         builder.addRulesLog()
         exportedMain(builder)
-        exportedAar(builder)
         if (exportedError) {
             builder.append("## 处理终止,请手动处理主model。")
             writeOut(builder)
             throw ManifestException(exportedErrorMessage)
         }
+        exportedAar(builder)
         writeOut(builder)
         println("-----exported->End-------")
     }
@@ -92,7 +92,7 @@ open class AddExportMainManifestTask : DefaultTask() {
     private fun exportedMain(builder: StringBuilder) {
         builder.append("## App-AndroidManifest\n")
         builder.append("> 这里是你的业务主model下需要调整的,建议手动处理。\n")
-        exportedManifest(mainManifest, builder, enableMainManifest)
+        exportedManifest(mainManifest, builder, true)
         builder.append("> 主model处理结束。\n")
         builder.append("---\n\n\n")
     }
@@ -101,7 +101,7 @@ open class AddExportMainManifestTask : DefaultTask() {
         builder.append("## aar-AndroidManifest\n")
         builder.append("> 这里是你的其他model或者aar下需要调整的,插件会自动进行处理。\n")
         manifests.forEach {
-            exportedManifest(it, builder, true)
+            exportedManifest(it, builder, false)
         }
     }
 
