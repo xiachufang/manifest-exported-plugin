@@ -79,7 +79,7 @@ exported {
     // 规则
     ruleFile new File("$projectDir/xxx.json")
     // 输出文件,默认-app/build/exported/outManifestLog.md
-		outPutFile null
+	outPutFile null
 }
 ```
 
