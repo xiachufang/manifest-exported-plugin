@@ -106,9 +106,7 @@ open class AddExportMainManifestTask : DefaultTask() {
     }
 
     private fun writeOut(outBuilder: StringBuilder) {
-        if (outPutFile == null) return
-        if (outPutFile!!.exists()) outPutFile!!.delete()
-        outPutFile!!.writeText(outBuilder.toString())
+        outPutFile?.writeText(outBuilder.toString())
     }
 
     private fun exportedManifest(file: File, outBuilder: StringBuilder, isMain: Boolean) {
