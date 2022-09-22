@@ -24,12 +24,8 @@ class ExportedPlugin : Plugin<Project> {
         readAppModelVariant(project)
         project.afterEvaluate {
             if (ext.outPutFile == null) {
-                val wikiFileDir = File("${it.buildDir.absoluteFile.path}/exported")
-                if (!wikiFileDir.exists()) wikiFileDir.mkdirs()
-                ext.outPutFile = File(wikiFileDir, "outManifestLog.md")
+                ext.outPutFile = File("${it.buildDir.absoluteFile.path}/exported/outManifestLog.md")
             }
-            if (ext.outPutFile?.exists() == true) ext.outPutFile?.delete()
-            ext.outPutFile?.createNewFile()
             addMainManifestTask(ext, project)
         }
     }

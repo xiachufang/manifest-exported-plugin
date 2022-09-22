@@ -106,7 +106,10 @@ open class AddExportMainManifestTask : DefaultTask() {
     }
 
     private fun writeOut(outBuilder: StringBuilder) {
-        outPutFile?.writeText(outBuilder.toString())
+        outPutFile?.apply {
+            createFileIfNoExists()
+            writeText(outBuilder.toString())
+        }
     }
 
     private fun exportedManifest(file: File, outBuilder: StringBuilder, isMain: Boolean) {
@@ -255,5 +258,13 @@ open class AddExportMainManifestTask : DefaultTask() {
                 it == value
             }
         } ?: false
+    }
+
+    private fun File.createFileIfNoExists() {
+        if (exists()) return
+        if (!parentFile.exists()) {
+            parentFile.mkdirs()
+        }
+        createNewFile()
     }
 }
