@@ -45,7 +45,7 @@ Gradle7.0+,并且已经对依赖方式进行过调整，则可能需要添加到
 
 ```groovy
 dependencies {
-      classpath 'com.github.xiachufang:manifest-exported-plugin:1.1.0'
+      classpath 'com.github.xiachufang:manifest-exported-plugin:1.1.1'
 }
 ```
 
